@@ -1,11 +1,22 @@
 const express = require("express");
 const nodemailer = require("nodemailer");
 const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+// SMTP Transporter config
+let transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+// API Route
 app.post("/send-email", async (req, res) => {
   const { name, email, position, status } = req.body;
 
@@ -31,18 +42,9 @@ Best regards,
 HR Team`;
   }
 
-  // Email SMTP Config
-  let transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: "debasiskr1234@gmail.com",
-      pass: "doea bqxw xvbe zevd"
-    }
-  });
-
   try {
     await transporter.sendMail({
-      from: `"HR Team 👥" <YOUR_EMAIL@gmail.com>`,
+      from: `"HR Team 🧑‍💼" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Regarding Your Job Application",
       text: message
@@ -54,4 +56,7 @@ HR Team`;
   }
 });
 
-app.listen(5000, () => console.log("Backend Server Running at http://localhost:5000"));
+// Start server
+app.listen(5000, () => {
+  console.log("Backend Server Running at http://localhost:5000");
+});
